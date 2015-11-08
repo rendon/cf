@@ -4,22 +4,24 @@ package main
 import (
 	"fmt"
 	"golang.org/x/net/html"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/codegangsta/cli"
 )
 
-func traverse(n *html.Node, mode, in, out *string, ins, outs *[]string) {
+func traverse(node *html.Node, mode, in, out *string, ins, outs *[]string) {
 	var found = false
-	if n.Type == html.ElementNode && (n.Data == "div" || n.Data == "br") {
-		if n.Data == "div" {
-			for _, a := range n.Attr {
+	var data = node.Data
+	if node.Type == html.ElementNode && (data == "div" || data == "br") {
+		if data == "div" {
+			for _, a := range node.Attr {
 				if a.Key == "class" && a.Val == "sample-test" {
 					found = true
 					break
 				}
 			}
-		} else if n.Data == "br" {
+		} else if data == "br" {
 			if *mode == "input" {
 				*in += "\n"
 			} else if *mode == "output" {
@@ -29,25 +31,25 @@ func traverse(n *html.Node, mode, in, out *string, ins, outs *[]string) {
 		if found {
 			*mode = "input"
 		}
-	} else if n.Type == html.TextNode && *mode != "" {
-		if n.Data == "Input" {
+	} else if node.Type == html.TextNode && *mode != "" {
+		if data == "Input" {
 			if *in != "" || *out != "" {
 				*ins = append(*ins, *in)
 				*outs = append(*outs, *out)
 			}
 			*in = ""
 			*mode = "input"
-		} else if n.Data == "Output" {
+		} else if data == "Output" {
 			*out = ""
 			*mode = "output"
 		} else if *mode == "input" {
-			*in += n.Data
+			*in += data
 		} else if *mode == "output" {
-			*out += n.Data
+			*out += data
 		}
 	}
 
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
+	for c := node.FirstChild; c != nil; c = c.NextSibling {
 		traverse(c, mode, in, out, ins, outs)
 	}
 	if found {
@@ -60,21 +62,19 @@ func traverse(n *html.Node, mode, in, out *string, ins, outs *[]string) {
 
 func parse(c *cli.Context) {
 	if len(c.Args()) != 1 {
-		log.Printf("USAGE: parse <URL>")
+		log.Fatalf("USAGE: parse <URL>")
 		return
 	}
 	var url = c.Args()[0]
 
 	var resp, err = http.Get(url)
 	if err != nil {
-		log.Printf("Error retrieving page: %s", err)
-		return
+		log.Fatalf("Error retrieving page: %s", err)
 	}
 
 	root, err := html.Parse(resp.Body)
 	if err != nil {
-		log.Printf("Error parsing document: %s", err)
-		return
+		log.Fatalf("Error parsing document: %s", err)
 	}
 	var mode string
 	var in string
@@ -84,10 +84,13 @@ func parse(c *cli.Context) {
 	traverse(root, &mode, &in, &out, &ins, &outs)
 
 	for i := 0; i < len(ins); i++ {
-		fmt.Printf("Input\n")
-		fmt.Printf("%s\n", ins[i])
-		fmt.Printf("Output\n")
-		fmt.Printf("%s\n", outs[i])
-		fmt.Printf("\n")
+		var inFile = fmt.Sprintf(".in_%d.txt", i)
+		if err = ioutil.WriteFile(inFile, []byte(ins[i]), 0644); err != nil {
+			log.Fatalf("Failed to write input for test case %d: %s", i, err)
+		}
+		var outFile = fmt.Sprintf(".out_%d.txt", i)
+		if err = ioutil.WriteFile(outFile, []byte(outs[i]), 0644); err != nil {
+			log.Fatalf("Failed to write output for test case %d: %s", i, err)
+		}
 	}
 }

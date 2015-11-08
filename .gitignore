@@ -1,3 +1,4 @@
 *.swp
 _vendor/
 bin/cf
+arena/

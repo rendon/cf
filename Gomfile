@@ -1,1 +1,2 @@
 gom "github.com/codegangsta/cli"
+gom "golang.org/x/net/html"

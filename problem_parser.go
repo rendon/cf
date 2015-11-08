@@ -4,7 +4,6 @@ package main
 import (
 	"fmt"
 	"golang.org/x/net/html"
-	"log"
 	"net/http"
 
 	"github.com/codegangsta/cli"

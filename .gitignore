@@ -1,2 +1,3 @@
 *.swp
-tp
+_vendor/
+bin/cf

@@ -2,6 +2,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"golang.org/x/net/html"
 	"io/ioutil"
@@ -60,37 +61,60 @@ func traverse(node *html.Node, mode, in, out *string, ins, outs *[]string) {
 	}
 }
 
-func parse(c *cli.Context) {
-	if len(c.Args()) != 1 {
-		log.Fatalf("USAGE: parse <URL>")
-		return
+func parseProblem(url string) ([]string, []string, error) {
+	var client = &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return errors.New("Not found")
+		},
 	}
-	var url = c.Args()[0]
-
-	var resp, err = http.Get(url)
+	var resp, err = client.Get(url)
 	if err != nil {
-		log.Fatalf("Error retrieving page: %s", err)
+		return nil, nil, fmt.Errorf("Error retrieving page: %s", err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, nil, errors.New("Non-okay response")
 	}
 
+	defer resp.Body.Close()
 	root, err := html.Parse(resp.Body)
 	if err != nil {
-		log.Fatalf("Error parsing document: %s", err)
+		return nil, nil, fmt.Errorf("Error parsing document: %s", err)
 	}
+
 	var mode string
 	var in string
 	var out string
 	var ins []string
 	var outs []string
 	traverse(root, &mode, &in, &out, &ins, &outs)
+	return ins, outs, nil
+}
 
+func writeTest(in, out, dir string, id int) error {
+	var inFile = fmt.Sprintf("%s.in_%d.txt", dir, id)
+	if err := ioutil.WriteFile(inFile, []byte(in), 0644); err != nil {
+		return fmt.Errorf("Failed to write test input: %s", err)
+	}
+	var outFile = fmt.Sprintf("%s.out_%d.txt", dir, id)
+	if err := ioutil.WriteFile(outFile, []byte(out), 0644); err != nil {
+		return fmt.Errorf("Failed to write test output: %s", err)
+	}
+	return nil
+}
+
+func parse(c *cli.Context) {
+	if len(c.Args()) != 1 {
+		log.Fatalf("USAGE: parse <URL>")
+		return
+	}
+	var url = c.Args()[0]
+	var ins, outs, err = parseProblem(url)
+	if err != nil {
+		log.Fatalf("Failed to parse problem: %s", err)
+	}
 	for i := 0; i < len(ins); i++ {
-		var inFile = fmt.Sprintf(".in_%d.txt", i)
-		if err = ioutil.WriteFile(inFile, []byte(ins[i]), 0644); err != nil {
-			log.Fatalf("Failed to write input for test case %d: %s", i, err)
-		}
-		var outFile = fmt.Sprintf(".out_%d.txt", i)
-		if err = ioutil.WriteFile(outFile, []byte(outs[i]), 0644); err != nil {
-			log.Fatalf("Failed to write output for test case %d: %s", i, err)
+		if err = writeTest(ins[i], outs[i], "", i); err != nil {
+			log.Fatalf("%s", err)
 		}
 	}
 }

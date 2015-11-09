@@ -22,8 +22,14 @@ func main() {
 		{
 			Name:      "parse",
 			Usage:     "Parses codeforces problem",
-			ArgsUsage: "<Problem URL>",
+			ArgsUsage: "<ProblemURL>",
 			Action:    parse,
+		},
+		{
+			Name:      "setup",
+			Usage:     "Setup environment for contest or single problem",
+			ArgsUsage: "<ContestID | ProblemURL>",
+			Action:    setup,
 		},
 	}
 

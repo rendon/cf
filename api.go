@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"golang.org/x/net/html"
+	"gopkg.in/yaml.v2"
 )
 
 // traverse Walks through the DOM and collect test cases.
@@ -102,4 +103,29 @@ func WriteTest(in, out, dir string, id int) error {
 		return fmt.Errorf("Failed to write test output: %s", err)
 	}
 	return nil
+}
+
+func ReadKeyValueYamlFile(file string) (map[string]interface{}, error) {
+	var buffer, err = ioutil.ReadFile(file)
+	if err != nil {
+		return nil, err
+	}
+	var doc map[interface{}]interface{}
+	err = yaml.Unmarshal(buffer, &doc)
+	var kv = make(map[string]interface{})
+	for k, v := range doc {
+		if _, ok := k.(string); !ok {
+			return nil, fmt.Errorf("%v is not a string")
+		}
+		kv[k.(string)] = v
+	}
+	return kv, nil
+}
+
+func WriteKeyValueYamlFile(doc map[string]interface{}) error {
+	var buf, err = yaml.Marshal(doc)
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile(".settings.yml", buf, 0664)
 }

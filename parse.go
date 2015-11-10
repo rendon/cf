@@ -2,6 +2,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/codegangsta/cli"
 )
 
@@ -19,5 +21,17 @@ func parse(c *cli.Context) {
 		if err = WriteTest(ins[i], outs[i], "", i); err != nil {
 			log.Fatalf("%s", err)
 		}
+	}
+
+	var settings = make(map[string]interface{})
+	if _, err = os.Stat(".settings.yml"); err == nil {
+		if settings, err = ReadKeyValueYamlFile(".settings.yml"); err != nil {
+			log.Fatalf("Failed to read settings file: %s", err)
+		}
+	} else {
+		settings["tests"] = len(ins)
+	}
+	if err = WriteKeyValueYamlFile(settings); err != nil {
+		log.Fatalf("Failed to write settings file: %s", err)
 	}
 }

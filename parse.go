@@ -31,7 +31,7 @@ func parse(c *cli.Context) {
 	} else {
 		settings["tests"] = len(ins)
 	}
-	if err = WriteKeyValueYamlFile(settings); err != nil {
+	if err = WriteKeyValueYamlFile("", settings); err != nil {
 		log.Fatalf("Failed to write settings file: %s", err)
 	}
 }

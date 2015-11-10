@@ -122,10 +122,11 @@ func ReadKeyValueYamlFile(file string) (map[string]interface{}, error) {
 	return kv, nil
 }
 
-func WriteKeyValueYamlFile(doc map[string]interface{}) error {
+func WriteKeyValueYamlFile(dir string, doc map[string]interface{}) error {
 	var buf, err = yaml.Marshal(doc)
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(".settings.yml", buf, 0664)
+	var file = fmt.Sprintf("%s.settings.yml", dir)
+	return ioutil.WriteFile(file, buf, 0664)
 }

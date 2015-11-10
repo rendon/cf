@@ -33,6 +33,10 @@ func setup(c *cli.Context) {
 				log.Fatalf("Problem %c: %s", p, err)
 			}
 		}
+		var settings = map[string]interface{}{"tests": len(ins)}
+		if err = WriteKeyValueYamlFile(dir, settings); err != nil {
+			log.Fatalf("%c: Failed to write settings file: %s", p, err)
+		}
 		fmt.Printf("Problem %c is ready!\n", p)
 	}
 }

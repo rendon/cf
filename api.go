@@ -2,6 +2,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -9,6 +10,20 @@ import (
 
 	"golang.org/x/net/html"
 	"gopkg.in/yaml.v2"
+)
+
+type Contest struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type ContestListResponse struct {
+	Status string    `json:"status"`
+	Result []Contest `json:"result"`
+}
+
+const (
+	baseURL = "http://codeforces.com"
 )
 
 // traverse Walks through the DOM and collect test cases.
@@ -129,4 +144,26 @@ func WriteKeyValueYamlFile(dir string, doc map[string]interface{}) error {
 	}
 	var file = fmt.Sprintf("%s.settings.yml", dir)
 	return ioutil.WriteFile(file, buf, 0664)
+}
+
+func GetContestName(id int) (string, error) {
+	var resp, err = http.Get("http://codeforces.com/api/contest.list")
+	if err != nil {
+		return "", err
+	}
+	buf, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	var contests ContestListResponse
+	if err = json.Unmarshal(buf, &contests); err != nil {
+		return "", err
+	}
+
+	for i := 0; i < len(contests.Result); i++ {
+		if id == contests.Result[i].ID {
+			return contests.Result[i].Name, nil
+		}
+	}
+	return "", errors.New("Contest not found")
 }

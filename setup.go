@@ -20,7 +20,7 @@ func setup(c *cli.Context) {
 	}
 	for p := 'A'; p <= 'Z'; p++ {
 		var url = fmt.Sprintf("http://codeforces.com/contest/%d/problem/%c", cid, p)
-		var ins, outs, err = parseProblem(url)
+		var ins, outs, err = ParseProblem(url)
 		if err != nil {
 			break
 		}
@@ -29,7 +29,7 @@ func setup(c *cli.Context) {
 			log.Fatalf("Failed to create directory: %s", err)
 		}
 		for i := 0; i < len(ins); i++ {
-			if err = writeTest(ins[i], outs[i], dir, i); err != nil {
+			if err = WriteTest(ins[i], outs[i], dir, i); err != nil {
 				log.Fatalf("Problem %c: %s", p, err)
 			}
 		}

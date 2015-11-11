@@ -3,9 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
 	"os/user"
-	"regexp"
 
 	"github.com/codegangsta/cli"
 )
@@ -43,31 +41,8 @@ func gen(c *cli.Context) {
 		cli.ShowCommandHelp(c, "gen")
 		return
 	}
-	var srcfile = c.Args()[0]
-
-	// Get file extension
-	var re = regexp.MustCompile(`\.([^.]+)$`)
-	var ext = re.FindString(srcfile)
-	if langSamples[ext] == "" {
-		log.Fatalf("Language not supported: %q", ext)
-	}
-
-	// Get directory (if any)
-	re = regexp.MustCompile(`([^/]*/)*`)
-	var dir = re.FindString(srcfile)
-	if dir != "" {
-		if err := os.MkdirAll(dir, 0755); err != nil {
-			log.Fatalf("Failed to create directory: %s", err)
-		}
-	}
-
-	code, err := getCodeFromTemplate(ext)
-	if err != nil {
-		//log.Printf("No template file found, using minimal template.")
-		code = langSamples[ext]
-	}
-
-	if err := ioutil.WriteFile(srcfile, []byte(code), 0664); err != nil {
-		log.Fatalf("Failed to write file contents: %s", err)
+	var srcFile = c.Args()[0]
+	if err := GenerateSampleSolution(srcFile); err != nil {
+		log.Fatalf("Failed to generate sample solution: %s", err)
 	}
 }

@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"regexp"
 
 	"golang.org/x/net/html"
 	"gopkg.in/yaml.v2"
@@ -166,4 +168,32 @@ func GetContestName(id int) (string, error) {
 		}
 	}
 	return "", errors.New("Contest not found")
+}
+
+func GenerateSampleSolution(srcFile string) error {
+	// Get file extension
+	var re = regexp.MustCompile(`\.([^.]+)$`)
+	var ext = re.FindString(srcFile)
+	if langSamples[ext] == "" {
+		return fmt.Errorf("Language not supported: %q", ext)
+	}
+
+	// Get directory (if any)
+	re = regexp.MustCompile(`([^/]*/)*`)
+	var dir = re.FindString(srcFile)
+	if dir != "" {
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			return err
+		}
+	}
+
+	code, err := getCodeFromTemplate(ext)
+	if err != nil {
+		code = langSamples[ext]
+	}
+
+	if err := ioutil.WriteFile(srcFile, []byte(code), 0664); err != nil {
+		return err
+	}
+	return nil
 }

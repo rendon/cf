@@ -19,6 +19,14 @@ func setup(c *cli.Context) {
 	if err != nil {
 		log.Fatalf("%q is not a valid contest ID: %s", c.Args()[0], err)
 	}
+
+	var lang = c.String("lang")
+	if lang != "" {
+		if langSamples["."+lang] == "" {
+			log.Fatalf("No language with code %q was found.", lang)
+		}
+	}
+
 	cname, err := GetContestName(cid)
 	if err != nil {
 		log.Printf("Failed to get contest name, using ID instead.")
@@ -49,7 +57,16 @@ func setup(c *cli.Context) {
 				log.Fatalf("Problem %c: %s", p, err)
 			}
 		}
+
 		var settings = map[string]interface{}{"tests": len(ins)}
+		if lang != "" {
+			var srcFile = fmt.Sprintf("%s%c.%s", dir, p, lang)
+			if err = GenerateSampleSolution(srcFile); err != nil {
+				log.Printf("Failed to generate sample solution: %s", err)
+			}
+			settings["lang"] = lang
+		}
+
 		if err = WriteKeyValueYamlFile(dir, settings); err != nil {
 			log.Fatalf("%c: Failed to write settings file: %s", p, err)
 		}

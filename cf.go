@@ -30,6 +30,12 @@ func main() {
 			Usage:     "Setup environment for contest or single problem",
 			ArgsUsage: "<ContestID | ProblemURL>",
 			Action:    setup,
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "lang",
+					Usage: "programming language for sample solutions",
+				},
+			},
 		},
 		{
 			Name:      "gen",

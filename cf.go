@@ -31,6 +31,12 @@ func main() {
 			ArgsUsage: "<ContestID | ProblemURL>",
 			Action:    setup,
 		},
+		{
+			Name:      "gen",
+			Usage:     "Generates sample solution",
+			ArgsUsage: "<source_file.ext>",
+			Action:    gen,
+		},
 	}
 
 	app.Run(os.Args)

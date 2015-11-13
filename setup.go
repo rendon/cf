@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -22,7 +23,7 @@ func setup(c *cli.Context) {
 
 	var lang = c.String("lang")
 	if lang != "" {
-		if langSamples["."+lang] == "" {
+		if langSamples[lang] == "" {
 			log.Fatalf("No language with code %q was found.", lang)
 		}
 	}
@@ -65,6 +66,7 @@ func setup(c *cli.Context) {
 				log.Printf("Failed to generate sample solution: %s", err)
 			}
 			settings["lang"] = lang
+			settings["src_file"] = filepath.Base(srcFile)
 		}
 
 		if err = WriteKeyValueYamlFile(dir, settings); err != nil {

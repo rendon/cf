@@ -8,7 +8,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"regexp"
+	"path/filepath"
+	"strings"
 
 	"golang.org/x/net/html"
 	"gopkg.in/yaml.v2"
@@ -172,15 +173,16 @@ func GetContestName(id int) (string, error) {
 
 func GenerateSampleSolution(srcFile string) error {
 	// Get file extension
-	var re = regexp.MustCompile(`\.([^.]+)$`)
-	var ext = re.FindString(srcFile)
+	var ext = filepath.Ext(srcFile)
+	if strings.HasPrefix(ext, ".") {
+		ext = ext[1:]
+	}
 	if langSamples[ext] == "" {
 		return fmt.Errorf("Language not supported: %q", ext)
 	}
 
 	// Get directory (if any)
-	re = regexp.MustCompile(`([^/]*/)*`)
-	var dir = re.FindString(srcFile)
+	var dir = filepath.Dir(srcFile)
 	if dir != "" {
 		if err := os.MkdirAll(dir, 0755); err != nil {
 			return err

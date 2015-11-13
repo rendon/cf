@@ -43,6 +43,11 @@ func main() {
 			ArgsUsage: "<source_file.ext>",
 			Action:    gen,
 		},
+		{
+			Name:   "test",
+			Usage:  "Runs solution against test cases",
+			Action: test,
+		},
 	}
 
 	app.Run(os.Args)

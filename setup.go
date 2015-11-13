@@ -23,7 +23,7 @@ func setup(c *cli.Context) {
 
 	var lang = c.String("lang")
 	if lang != "" {
-		if langSamples[lang] == "" {
+		if langs[lang] == nil {
 			log.Fatalf("No language with code %q was found.", lang)
 		}
 	}

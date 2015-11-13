@@ -8,11 +8,6 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-var langSamples = map[string]string{
-	"go":  "package main\n\nimport ()\n\nfunc main() {\n}\n",
-	"cpp": "#include <bits/stdc++.h>\nint main() {\n    return 0;\n}\n",
-}
-
 func getCodeFromTemplate(ext string) (string, error) {
 	user, err := user.Current()
 	if err != nil {

@@ -2,12 +2,14 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -25,9 +27,84 @@ type ContestListResponse struct {
 	Result []Contest `json:"result"`
 }
 
+type Lang struct {
+	Name   string
+	Sample string
+	Setup  func(string) error
+	Run    func(string, string, string) (bool, error)
+}
+
 const (
 	baseURL = "http://codeforces.com"
 )
+
+func cppSetup(srcFile string) error {
+	ext := filepath.Ext(srcFile)
+	if ext == "" {
+		return errors.New("File has no extension")
+	}
+	out := strings.TrimSuffix(srcFile, ext)
+	ext = ext[1:]
+	cmd := exec.Command("g++", "-W", "-o", out, srcFile)
+	err := cmd.Start()
+	if err != nil {
+		return err
+	}
+	err = cmd.Wait()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func cppRun(srcFile, inFile, outFile string) (bool, error) {
+	ext := filepath.Ext(srcFile)
+	if ext == "" {
+		return false, errors.New("File has no extension")
+	}
+	wd, err := os.Getwd()
+	if err != nil {
+		return false, err
+	}
+	executable := wd + "/" + strings.TrimSuffix(srcFile, ext)
+	cmd := exec.Command(executable)
+
+	// Read input
+	buf, err := ioutil.ReadFile(inFile)
+	if err != nil {
+		return false, err
+	}
+	cmd.Stdin = bytes.NewReader(buf)
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	if err = cmd.Start(); err != nil {
+		return false, err
+	}
+	if err = cmd.Wait(); err != nil {
+		return false, err
+	}
+
+	buf, err = ioutil.ReadFile(outFile)
+	if err != nil {
+		return false, err
+	}
+	expected := string(buf)
+	actual := out.String()
+	return expected == actual, nil
+}
+
+var langs = map[string]*Lang{
+	"go": &Lang{
+		Name:   "Golang",
+		Sample: "package main\n\nimport ()\n\nfunc main() {\n}\n",
+	},
+	"cpp": &Lang{
+		Name:   "C++",
+		Sample: "#include <bits/stdc++.h>\nint main() {\n    return 0;\n}\n",
+		Setup:  cppSetup,
+		Run:    cppRun,
+	},
+}
 
 // traverse Walks through the DOM and collect test cases.
 func traverse(node *html.Node, mode, in, out *string, ins, outs *[]string) {
@@ -177,7 +254,7 @@ func GenerateSampleSolution(srcFile string) error {
 	if strings.HasPrefix(ext, ".") {
 		ext = ext[1:]
 	}
-	if langSamples[ext] == "" {
+	if langs[ext] == nil {
 		return fmt.Errorf("Language not supported: %q", ext)
 	}
 
@@ -191,7 +268,7 @@ func GenerateSampleSolution(srcFile string) error {
 
 	code, err := getCodeFromTemplate(ext)
 	if err != nil {
-		code = langSamples[ext]
+		code = langs[ext].Sample
 	}
 
 	if err := ioutil.WriteFile(srcFile, []byte(code), 0664); err != nil {

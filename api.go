@@ -46,12 +46,10 @@ func cppSetup(srcFile string) error {
 	out := strings.TrimSuffix(srcFile, ext)
 	ext = ext[1:]
 	cmd := exec.Command("g++", "-W", "-o", out, srcFile)
-	err := cmd.Start()
-	if err != nil {
+	if err := cmd.Start(); err != nil {
 		return err
 	}
-	err = cmd.Wait()
-	if err != nil {
+	if err := cmd.Wait(); err != nil {
 		return err
 	}
 	return nil
@@ -88,8 +86,55 @@ func cppRun(srcFile, inFile, outFile string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	expected := string(buf)
-	actual := out.String()
+	expected := strings.TrimRight(string(buf), "\n")
+	actual := strings.TrimRight(out.String(), "\n")
+	return expected == actual, nil
+}
+
+func goSetup(srcFile string) error {
+	cmd := exec.Command("go", "build", srcFile)
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+	if err := cmd.Wait(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func goRun(srcFile, inFile, outFile string) (bool, error) {
+	ext := filepath.Ext(srcFile)
+	if ext == "" {
+		return false, errors.New("File has no extension")
+	}
+	wd, err := os.Getwd()
+	if err != nil {
+		return false, err
+	}
+	executable := wd + "/" + strings.TrimSuffix(srcFile, ext)
+	cmd := exec.Command(executable)
+
+	// Read input
+	buf, err := ioutil.ReadFile(inFile)
+	if err != nil {
+		return false, err
+	}
+	cmd.Stdin = bytes.NewReader(buf)
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	if err = cmd.Start(); err != nil {
+		return false, err
+	}
+	if err = cmd.Wait(); err != nil {
+		return false, err
+	}
+
+	buf, err = ioutil.ReadFile(outFile)
+	if err != nil {
+		return false, err
+	}
+	expected := strings.TrimRight(string(buf), "\n")
+	actual := strings.TrimRight(out.String(), "\n")
 	return expected == actual, nil
 }
 
@@ -97,6 +142,8 @@ var langs = map[string]*Lang{
 	"go": &Lang{
 		Name:   "Golang",
 		Sample: "package main\n\nimport ()\n\nfunc main() {\n}\n",
+		Setup:  goSetup,
+		Run:    goRun,
 	},
 	"cpp": &Lang{
 		Name:   "C++",

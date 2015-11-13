@@ -28,8 +28,7 @@ func test(c *cli.Context) {
 		log.Fatalf("Language %q not supported.", lang)
 	}
 
-	err = langs[lang].Setup(srcFile)
-	if err != nil {
+	if err = langs[lang].Setup(srcFile); err != nil {
 		log.Printf("Failed to setup source file: %s", err)
 	}
 	for i := 0; i < tests; i++ {

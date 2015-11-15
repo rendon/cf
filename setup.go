@@ -49,7 +49,7 @@ func setup(c *cli.Context) {
 		if err != nil {
 			break
 		}
-		var dir = fmt.Sprintf("%s/%c/", cname, p)
+		var dir = fmt.Sprintf("%s/%c", cname, p)
 		if err = os.MkdirAll(dir, 0775); err != nil {
 			log.Fatalf("Failed to create directory: %s", err)
 		}
@@ -61,7 +61,7 @@ func setup(c *cli.Context) {
 
 		var settings = map[string]interface{}{"tests": len(ins)}
 		if lang != "" {
-			var srcFile = fmt.Sprintf("%s%c.%s", dir, p, lang)
+			var srcFile = fmt.Sprintf("%s/%c.%s", dir, p, lang)
 			if err = GenerateSampleSolution(srcFile); err != nil {
 				log.Printf("Failed to generate sample solution: %s", err)
 			}
@@ -69,7 +69,7 @@ func setup(c *cli.Context) {
 			settings["src_file"] = filepath.Base(srcFile)
 		}
 
-		if err = WriteKeyValueYamlFile(dir, settings); err != nil {
+		if err = WriteKeyValueYamlFile(dir+"/.settings.yml", settings); err != nil {
 			log.Fatalf("%c: Failed to write settings file: %s", p, err)
 		}
 		fmt.Printf("Problem %c is ready!\n", p)

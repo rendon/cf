@@ -18,7 +18,7 @@ func parse(c *cli.Context) {
 		log.Fatalf("Failed to parse problem: %s", err)
 	}
 	for i := 0; i < len(ins); i++ {
-		if err = WriteTest(ins[i], outs[i], "", i); err != nil {
+		if err = WriteTest(ins[i], outs[i], ".", i); err != nil {
 			log.Fatalf("%s", err)
 		}
 	}
@@ -31,7 +31,7 @@ func parse(c *cli.Context) {
 	} else {
 		settings["tests"] = len(ins)
 	}
-	if err = WriteKeyValueYamlFile("", settings); err != nil {
+	if err = WriteKeyValueYamlFile(".settings.yml", settings); err != nil {
 		log.Fatalf("Failed to write settings file: %s", err)
 	}
 }

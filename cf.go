@@ -48,6 +48,18 @@ func main() {
 			Usage:  "Runs solution against test cases",
 			Action: test,
 		},
+		{
+			Name:      "set",
+			Usage:     "Sets settings values",
+			ArgsUsage: "<key> <value>",
+			Action:    set,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "global",
+					Usage: "Settings for ~/.cf.yml file",
+				},
+			},
+		},
 	}
 
 	app.Run(os.Args)

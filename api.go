@@ -31,12 +31,37 @@ type Lang struct {
 	Name   string
 	Sample string
 	Setup  func(string) error
-	Run    func(string, string, string) (bool, error)
+	Run    func(string, string, string, string) (bool, error)
 }
 
 const (
 	baseURL = "http://codeforces.com"
+
+	validatorExact      = "exact"
+	validatorLines      = "lines"
+	validatorNumeric1e6 = "numeric1e6"
 )
+
+var validators = map[string]func(string, string) bool{
+	"lines": func(expected, actual string) bool {
+		l1 := strings.Split(strings.TrimRight(expected, "\n"), "\n")
+		l2 := strings.Split(strings.TrimRight(actual, "\n"), "\n")
+		if len(l1) != len(l2) {
+			return false
+		}
+		for i := 0; i < len(l1); i++ {
+			a := strings.TrimRight(l1[i], " ")
+			b := strings.TrimRight(l2[i], " ")
+			if a != b {
+				return false
+			}
+		}
+		return true
+	},
+	"exact": func(expected, actual string) bool {
+		return expected == actual
+	},
+}
 
 func cppSetup(srcFile string) error {
 	ext := filepath.Ext(srcFile)
@@ -55,7 +80,11 @@ func cppSetup(srcFile string) error {
 	return nil
 }
 
-func cppRun(srcFile, inFile, outFile string) (bool, error) {
+func cppRun(srcFile, inFile, outFile, validator string) (bool, error) {
+	if validators[validator] == nil {
+		return false, errors.New("Unknown validator")
+	}
+
 	ext := filepath.Ext(srcFile)
 	if ext == "" {
 		return false, errors.New("File has no extension")
@@ -86,9 +115,9 @@ func cppRun(srcFile, inFile, outFile string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	expected := strings.TrimRight(string(buf), "\n")
-	actual := strings.TrimRight(out.String(), "\n")
-	return expected == actual, nil
+	expected := string(buf)
+	actual := out.String()
+	return validators[validator](expected, actual), nil
 }
 
 func goSetup(srcFile string) error {
@@ -102,7 +131,11 @@ func goSetup(srcFile string) error {
 	return nil
 }
 
-func goRun(srcFile, inFile, outFile string) (bool, error) {
+func goRun(srcFile, inFile, outFile, validator string) (bool, error) {
+	if validators[validator] == nil {
+		return false, errors.New("Unknown validator")
+	}
+
 	ext := filepath.Ext(srcFile)
 	if ext == "" {
 		return false, errors.New("File has no extension")
@@ -133,9 +166,9 @@ func goRun(srcFile, inFile, outFile string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	expected := strings.TrimRight(string(buf), "\n")
-	actual := strings.TrimRight(out.String(), "\n")
-	return expected == actual, nil
+	expected := string(buf)
+	actual := out.String()
+	return validators[validator](expected, actual), nil
 }
 
 var langs = map[string]*Lang{

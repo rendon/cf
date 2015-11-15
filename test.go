@@ -23,6 +23,10 @@ func test(c *cli.Context) {
 	if !ok {
 		log.Fatalf("No 'tests' field found in settings file.")
 	}
+	validator, ok := settings["validator"].(string)
+	if !ok {
+		validator = validatorExact
+	}
 
 	if langs[lang] == nil {
 		log.Fatalf("Language %q not supported.", lang)
@@ -34,7 +38,7 @@ func test(c *cli.Context) {
 	for i := 0; i < tests; i++ {
 		in := fmt.Sprintf(".in_%d.txt", i)
 		out := fmt.Sprintf(".out_%d.txt", i)
-		passed, err := langs[lang].Run(srcFile, in, out)
+		passed, err := langs[lang].Run(srcFile, in, out, validator)
 		if err != nil {
 			log.Fatalf("Test %d failed: %s", i, err)
 		}

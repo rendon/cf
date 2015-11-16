@@ -31,10 +31,10 @@ func main() {
 	}
 	app.Commands = []cli.Command{
 		{
-			Name:      "parse",
-			Usage:     "Parses codeforces problem",
+			Name:      "get",
+			Usage:     "Retrieves test cases for a single codeforces problem",
 			ArgsUsage: "<ProblemURL>",
-			Action:    parse,
+			Action:    get,
 		},
 		{
 			Name:      "setup",

@@ -8,9 +8,9 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-func parse(c *cli.Context) {
+func get(c *cli.Context) {
 	if len(c.Args()) != 1 {
-		log.Fatalf("USAGE: parse <URL>")
+		log.Fatalf("USAGE: get <URL>")
 		return
 	}
 	var url = c.Args()[0]

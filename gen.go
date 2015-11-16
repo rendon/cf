@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os/user"
+	"path/filepath"
 
 	"github.com/codegangsta/cli"
 )
@@ -40,4 +41,17 @@ func gen(c *cli.Context) {
 	if err := GenerateSampleSolution(srcFile); err != nil {
 		log.Fatalf("Failed to generate sample solution: %s", err)
 	}
+
+	// At this point we know srcFile contains a valid extension
+	ext := filepath.Ext(srcFile)[1:]
+	settings, err := ReadKeyValueYamlFile(".settings.yml")
+	if err != nil {
+		log.Printf("Failed to read settings file: %s\n", err)
+	}
+	settings["lang"] = ext
+	settings["src_file"] = srcFile
+	if err = WriteKeyValueYamlFile(".settings.yml", settings); err != nil {
+		log.Printf("Failed to write settings file: %s\n", err)
+	}
+
 }

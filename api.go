@@ -6,7 +6,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"math"
 	"net/http"
 	"os"
 	"os/exec"
@@ -61,6 +63,31 @@ var validators = map[string]func(string, string) bool{
 	"exact": func(expected, actual string) bool {
 		return expected == actual
 	},
+	"numeric1e6": func(expected, actual string) bool {
+		r1 := strings.NewReader(expected)
+		r2 := strings.NewReader(actual)
+		for {
+			var a, b float64
+			_, err1 := fmt.Fscan(r1, &a)
+			_, err2 := fmt.Fscan(r2, &b)
+			if err1 == io.EOF || err2 == io.EOF {
+				if err1 != io.EOF {
+					log.Printf("Output has less tokens than answer.")
+					return false
+				}
+				if err2 != io.EOF {
+					log.Printf("Output has more tokens than answer.")
+					return false
+				}
+				break
+			}
+			if math.Abs(b-a) > 1e-6 {
+				log.Printf("expected %f, got %f\n", a, b)
+				return false
+			}
+		}
+		return true
+	},
 }
 
 func cppSetup(srcFile string) error {
@@ -82,7 +109,7 @@ func cppSetup(srcFile string) error {
 
 func cppRun(srcFile, inFile, outFile, validator string) (bool, error) {
 	if validators[validator] == nil {
-		return false, errors.New("Unknown validator")
+		return false, fmt.Errorf("Unknown validator: %q", validator)
 	}
 
 	ext := filepath.Ext(srcFile)
@@ -133,7 +160,7 @@ func goSetup(srcFile string) error {
 
 func goRun(srcFile, inFile, outFile, validator string) (bool, error) {
 	if validators[validator] == nil {
-		return false, errors.New("Unknown validator")
+		return false, fmt.Errorf("Unknown validator: %q", validator)
 	}
 
 	ext := filepath.Ext(srcFile)

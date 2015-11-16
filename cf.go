@@ -49,11 +49,15 @@ func main() {
 			Action: test,
 		},
 		{
-			Name:      "set",
-			Usage:     "Sets settings values",
-			ArgsUsage: "<key> <value>",
-			Action:    set,
+			Name:      "config",
+			Usage:     "Set or show settings",
+			ArgsUsage: "[<key> <value>]",
+			Action:    config,
 			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "list",
+					Usage: "Display current settings",
+				},
 				cli.BoolFlag{
 					Name:  "global",
 					Usage: "Settings for ~/.cf.yml file",

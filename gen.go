@@ -18,7 +18,7 @@ func getCodeFromTemplate(ext string) (string, error) {
 		return "", err
 	}
 
-	var key = "template" + ext
+	var key = "template." + ext
 	template, ok := settings[key].(string)
 	if !ok {
 		return "", fmt.Errorf("Failed to get %q from setting file.", key)

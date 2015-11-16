@@ -20,16 +20,19 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Contest contains basic fields of a Codeforces contest
 type Contest struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
 
+// ContestListResponse a list of contests, as Codeforces returns them.
 type ContestListResponse struct {
 	Status string    `json:"status"`
 	Result []Contest `json:"result"`
 }
 
+// Lang contains values and functions for every supported language.
 type Lang struct {
 	Name   string
 	Sample string
@@ -45,6 +48,7 @@ const (
 	validatorNumeric1e6 = "numeric1e6"
 )
 
+// validators functions for every supported validator
 var validators = map[string]func(string, string) bool{
 	"lines": func(expected, actual string) bool {
 		l1 := strings.Split(strings.TrimRight(expected, "\n"), "\n")
@@ -96,6 +100,7 @@ var validators = map[string]func(string, string) bool{
 	},
 }
 
+// cppSetup compiles C++ solution
 func cppSetup(srcFile string) error {
 	ext := filepath.Ext(srcFile)
 	if ext == "" {
@@ -113,6 +118,7 @@ func cppSetup(srcFile string) error {
 	return nil
 }
 
+// cppRun tests C++ solution with given input and output.
 func cppRun(srcFile, inFile, outFile, validator string) (bool, error) {
 	if validators[validator] == nil {
 		return false, fmt.Errorf("Unknown validator: %q", validator)
@@ -153,6 +159,7 @@ func cppRun(srcFile, inFile, outFile, validator string) (bool, error) {
 	return validators[validator](expected, actual), nil
 }
 
+// goSetup compiles Go solution
 func goSetup(srcFile string) error {
 	cmd := exec.Command("go", "build", srcFile)
 	if err := cmd.Start(); err != nil {
@@ -164,6 +171,7 @@ func goSetup(srcFile string) error {
 	return nil
 }
 
+// goRun tests Go solution with given input and output.
 func goRun(srcFile, inFile, outFile, validator string) (bool, error) {
 	if validators[validator] == nil {
 		return false, fmt.Errorf("Unknown validator: %q", validator)
@@ -204,6 +212,7 @@ func goRun(srcFile, inFile, outFile, validator string) (bool, error) {
 	return validators[validator](expected, actual), nil
 }
 
+// langs supported languages
 var langs = map[string]*Lang{
 	"go": &Lang{
 		Name:   "Golang",
@@ -313,6 +322,7 @@ func WriteTest(in, out, dir string, id int) error {
 	return nil
 }
 
+// ReadKeyValueYamlFile reads YAML file and returns a map of string -> interface
 func ReadKeyValueYamlFile(file string) (map[string]interface{}, error) {
 	var buffer, err = ioutil.ReadFile(file)
 	if err != nil {
@@ -330,6 +340,7 @@ func ReadKeyValueYamlFile(file string) (map[string]interface{}, error) {
 	return kv, nil
 }
 
+// WriteKeyValueYamlFile writes YAML representation of `doc` to a file.
 func WriteKeyValueYamlFile(dir string, doc map[string]interface{}) error {
 	var buf, err = yaml.Marshal(doc)
 	if err != nil {
@@ -339,6 +350,7 @@ func WriteKeyValueYamlFile(dir string, doc map[string]interface{}) error {
 	return ioutil.WriteFile(file, buf, 0664)
 }
 
+// GetContestName returns the name of contest with ID `id`.
 func GetContestName(id int) (string, error) {
 	var resp, err = http.Get("http://codeforces.com/api/contest.list")
 	if err != nil {
@@ -361,6 +373,8 @@ func GetContestName(id int) (string, error) {
 	return "", errors.New("Contest not found")
 }
 
+// GenerateSampleSolution generates sample solution from file name, programming
+// language will be determined from file extension.
 func GenerateSampleSolution(srcFile string) error {
 	// Get file extension
 	var ext = filepath.Ext(srcFile)

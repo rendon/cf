@@ -6,6 +6,7 @@ import (
 	"os/user"
 	"path/filepath"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
 )
 

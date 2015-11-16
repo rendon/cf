@@ -15,6 +15,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	log "github.com/Sirupsen/logrus"
 	"golang.org/x/net/html"
 	"gopkg.in/yaml.v2"
 )
@@ -55,13 +56,18 @@ var validators = map[string]func(string, string) bool{
 			a := strings.TrimRight(l1[i], " ")
 			b := strings.TrimRight(l2[i], " ")
 			if a != b {
+				log.Printf("Expected %q, got %q", a, b)
 				return false
 			}
 		}
 		return true
 	},
 	"exact": func(expected, actual string) bool {
-		return expected == actual
+		if expected != actual {
+			log.Printf("Expected %q, got %q", expected, actual)
+			return false
+		}
+		return true
 	},
 	"numeric1e6": func(expected, actual string) bool {
 		r1 := strings.NewReader(expected)
@@ -82,7 +88,7 @@ var validators = map[string]func(string, string) bool{
 				break
 			}
 			if math.Abs(b-a) > 1e-6 {
-				log.Printf("expected %f, got %f\n", a, b)
+				log.Printf("Expected %f, got %f: delta > 1e-6\n", a, b)
 				return false
 			}
 		}

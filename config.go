@@ -5,6 +5,7 @@ import (
 	"os/user"
 	"strconv"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
 )
 

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
 )
 
@@ -38,11 +39,15 @@ func test(c *cli.Context) {
 	for i := 0; i < tests; i++ {
 		in := fmt.Sprintf(".in_%d.txt", i)
 		out := fmt.Sprintf(".out_%d.txt", i)
+		fmt.Printf("Test #%d:", i)
+		if c.GlobalBool("verbose") {
+			fmt.Println()
+		}
+
 		passed, err := langs[lang].Run(srcFile, in, out, validator)
 		if err != nil {
 			log.Fatalf("Test %d failed: %s", i, err)
 		}
-		fmt.Printf("Test #%d: ", i)
 		if passed {
 			fmt.Printf("PASSED\n")
 		} else {

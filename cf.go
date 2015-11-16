@@ -1,16 +1,14 @@
 package main
 
 import (
-	logger "log"
 	"os"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
 )
 
-var log *logger.Logger
-
 func init() {
-	log = logger.New(os.Stderr, "", 0)
+	log.SetLevel(log.WarnLevel)
 }
 
 func main() {
@@ -18,6 +16,19 @@ func main() {
 	app.Name = "cf"
 	app.Version = "0.1.0"
 	app.Usage = "Codeforces client"
+	app.Action = func(c *cli.Context) {
+		if c.Bool("version") {
+			cli.ShowVersion(c)
+			return
+		}
+		cli.ShowAppHelp(c)
+	}
+	app.Before = func(c *cli.Context) error {
+		if c.GlobalBool("verbose") {
+			log.SetLevel(log.InfoLevel)
+		}
+		return nil
+	}
 	app.Commands = []cli.Command{
 		{
 			Name:      "parse",
@@ -63,6 +74,17 @@ func main() {
 					Usage: "Settings for ~/.cf.yml file",
 				},
 			},
+		},
+	}
+	app.HideVersion = true
+	app.Flags = []cli.Flag{
+		cli.BoolFlag{
+			Name:  "verbose, v",
+			Usage: "Display detailed information of the operations",
+		},
+		cli.BoolFlag{
+			Name:  "version, V",
+			Usage: "print the version",
 		},
 	}
 

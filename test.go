@@ -26,7 +26,7 @@ func test(c *cli.Context) {
 	}
 	validator, ok := settings["validator"].(string)
 	if !ok {
-		validator = validatorExact
+		validator = validatorLines
 	}
 
 	if langs[lang] == nil {
@@ -34,7 +34,7 @@ func test(c *cli.Context) {
 	}
 
 	if err = langs[lang].Setup(srcFile); err != nil {
-		log.Printf("Failed to setup source file: %s", err)
+		log.Fatalf("Failed to setup source file: %s", err)
 	}
 	for i := 0; i < tests; i++ {
 		in := fmt.Sprintf(".in_%d.txt", i)

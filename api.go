@@ -108,12 +108,20 @@ func cppSetup(srcFile string) error {
 	}
 	out := strings.TrimSuffix(srcFile, ext)
 	ext = ext[1:]
-	cmd := exec.Command("g++", "-W", "-o", out, srcFile)
+	cmd := exec.Command("g++", "-std=c++11", "-W", "-o", out, srcFile)
+
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+
 	if err := cmd.Start(); err != nil {
 		return err
 	}
 	if err := cmd.Wait(); err != nil {
-		return err
+		if stderr.Len() > 0 {
+			return errors.New(stderr.String())
+		} else {
+			return err
+		}
 	}
 	return nil
 }
@@ -162,11 +170,17 @@ func cppRun(srcFile, inFile, outFile, validator string) (bool, error) {
 // goSetup compiles Go solution
 func goSetup(srcFile string) error {
 	cmd := exec.Command("go", "build", srcFile)
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
 	if err := cmd.Start(); err != nil {
 		return err
 	}
 	if err := cmd.Wait(); err != nil {
-		return err
+		if stderr.Len() > 0 {
+			return errors.New(stderr.String())
+		} else {
+			return err
+		}
 	}
 	return nil
 }

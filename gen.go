@@ -48,6 +48,7 @@ func gen(c *cli.Context) {
 	settings, err := ReadKeyValueYamlFile(".settings.yml")
 	if err != nil {
 		log.Printf("Failed to read settings file: %s\n", err)
+		settings = make(map[string]interface{})
 	}
 	settings["lang"] = ext
 	settings["src_file"] = srcFile

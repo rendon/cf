@@ -70,7 +70,8 @@ func setup(c *cli.Context) {
 			settings["src_file"] = filepath.Base(srcFile)
 		}
 
-		if err = WriteKeyValueYamlFile(dir+"/.settings.yml", settings); err != nil {
+		err = WriteKeyValueYamlFile(dir+"/.settings.yml", settings)
+		if err != nil {
 			log.Fatalf("%c: Failed to write settings file: %s", p, err)
 		}
 		fmt.Printf("Problem %c is ready!\n", p)

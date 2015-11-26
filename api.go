@@ -119,9 +119,8 @@ func cppSetup(srcFile string) error {
 	if err := cmd.Wait(); err != nil {
 		if stderr.Len() > 0 {
 			return errors.New(stderr.String())
-		} else {
-			return err
 		}
+		return err
 	}
 	return nil
 }
@@ -178,9 +177,8 @@ func goSetup(srcFile string) error {
 	if err := cmd.Wait(); err != nil {
 		if stderr.Len() > 0 {
 			return errors.New(stderr.String())
-		} else {
-			return err
 		}
+		return err
 	}
 	return nil
 }

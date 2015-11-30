@@ -125,8 +125,8 @@ func cppSetup(srcFile string) error {
 	return nil
 }
 
-// cppRun tests C++ solution with given input and output.
-func cppRun(srcFile, inFile, outFile, validator string) (bool, error) {
+// runBinary tests C++ solution with given input and output.
+func runBinary(srcFile, inFile, outFile, validator string) (bool, error) {
 	if validators[validator] == nil {
 		return false, fmt.Errorf("Unknown validator: %q", validator)
 	}
@@ -164,6 +164,31 @@ func cppRun(srcFile, inFile, outFile, validator string) (bool, error) {
 	expected := string(buf)
 	actual := out.String()
 	return validators[validator](expected, actual), nil
+}
+
+// cSetup compiles C solution
+func cSetup(srcFile string) error {
+	ext := filepath.Ext(srcFile)
+	if ext == "" {
+		return errors.New("File has no extension")
+	}
+	out := strings.TrimSuffix(srcFile, ext)
+	ext = ext[1:]
+	cmd := exec.Command("gcc", "-W", "-o", out, srcFile)
+
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+	if err := cmd.Wait(); err != nil {
+		if stderr.Len() > 0 {
+			return errors.New(stderr.String())
+		}
+		return err
+	}
+	return nil
 }
 
 // goSetup compiles Go solution
@@ -183,60 +208,25 @@ func goSetup(srcFile string) error {
 	return nil
 }
 
-// goRun tests Go solution with given input and output.
-func goRun(srcFile, inFile, outFile, validator string) (bool, error) {
-	if validators[validator] == nil {
-		return false, fmt.Errorf("Unknown validator: %q", validator)
-	}
-
-	ext := filepath.Ext(srcFile)
-	if ext == "" {
-		return false, errors.New("File has no extension")
-	}
-	wd, err := os.Getwd()
-	if err != nil {
-		return false, err
-	}
-	executable := wd + "/" + strings.TrimSuffix(srcFile, ext)
-	cmd := exec.Command(executable)
-
-	// Read input
-	buf, err := ioutil.ReadFile(inFile)
-	if err != nil {
-		return false, err
-	}
-	cmd.Stdin = bytes.NewReader(buf)
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	if err = cmd.Start(); err != nil {
-		return false, err
-	}
-	if err = cmd.Wait(); err != nil {
-		return false, err
-	}
-
-	buf, err = ioutil.ReadFile(outFile)
-	if err != nil {
-		return false, err
-	}
-	expected := string(buf)
-	actual := out.String()
-	return validators[validator](expected, actual), nil
-}
-
 // langs supported languages
 var langs = map[string]*Lang{
 	"go": &Lang{
 		Name:   "Golang",
 		Sample: "package main\n\nimport ()\n\nfunc main() {\n}\n",
 		Setup:  goSetup,
-		Run:    goRun,
+		Run:    runBinary,
 	},
 	"cpp": &Lang{
 		Name:   "C++",
 		Sample: "#include <bits/stdc++.h>\nint main() {\n    return 0;\n}\n",
 		Setup:  cppSetup,
-		Run:    cppRun,
+		Run:    runBinary,
+	},
+	"c": &Lang{
+		Name:   "C",
+		Sample: "#include <stdio.h>\nint main() {\n    return 0;\n}\n",
+		Setup:  cSetup,
+		Run:    runBinary,
 	},
 }
 

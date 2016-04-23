@@ -1,4 +1,0 @@
-gom "github.com/Sirupsen/logrus", :tag => "v0.8.7"
-gom "github.com/codegangsta/cli"
-gom "golang.org/x/net/html"
-gom "gopkg.in/yaml.v2"

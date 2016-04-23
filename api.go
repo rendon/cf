@@ -335,7 +335,7 @@ func ReadKeyValueYamlFile(file string) (map[string]interface{}, error) {
 	var kv = make(map[string]interface{})
 	for k, v := range doc {
 		if _, ok := k.(string); !ok {
-			return nil, fmt.Errorf("%v is not a string")
+			return nil, fmt.Errorf("%v is not a string", k)
 		}
 		kv[k.(string)] = v
 	}

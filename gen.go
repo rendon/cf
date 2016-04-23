@@ -51,8 +51,12 @@ func gen(c *cli.Context) {
 		settings = make(map[string]interface{})
 	}
 	settings["lang"] = ext
-	settings["src_file"] = srcFile
-	if err = WriteKeyValueYamlFile(".settings.yml", settings); err != nil {
+	settings["src_file"] = filepath.Base(srcFile)
+	settingsFile := ".settings.yml"
+	if dir := filepath.Dir(srcFile); dir != "" {
+		settingsFile = dir + "/" + settingsFile
+	}
+	if err = WriteKeyValueYamlFile(settingsFile, settings); err != nil {
 		log.Printf("Failed to write settings file: %s\n", err)
 	}
 

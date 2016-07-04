@@ -396,7 +396,10 @@ func GenerateSampleSolution(srcFile string) error {
 	}
 
 	code, err := getCodeFromTemplate(ext)
+
+	// In case of error use default template
 	if err != nil {
+		log.Warnf("Failed to generate code from template: %q", err)
 		code = langs[ext].Sample
 	}
 

@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-BIN_DIR=$HOME/bin
-
-bin/build || exit 1
-
-mkdir -p $BIN_DIR
-cp -v bin/cf $BIN_DIR/cf

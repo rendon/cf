@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-mkdir -p bin/
-if [[ $OSTYPE =~ "linux" ]]
-then
-    GOOS=linux GOARCH=amd64 gom build -o bin/cf
-elif [[ $OSTYPE =~ "darwin" ]]
-then
-    GOOS=darwin GOARCH=amd64 gom build -o bin/cf
-fi

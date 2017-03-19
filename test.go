@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
@@ -44,14 +45,16 @@ func test(c *cli.Context) {
 			fmt.Println()
 		}
 
+		start := time.Now()
 		passed, err := langs[lang].Run(srcFile, in, out, validator)
 		if err != nil {
 			log.Fatalf("Test %d failed: %s", i, err)
 		}
+		end := time.Now()
 		if passed {
-			fmt.Printf("PASSED\n")
+			fmt.Printf("PASSED %.3fs\n", end.Sub(start).Seconds())
 		} else {
-			fmt.Printf("FAILED\n")
+			fmt.Printf("FAILED %.3fs\n", end.Sub(start).Seconds())
 		}
 	}
 }

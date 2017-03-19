@@ -313,11 +313,11 @@ func ParseProblem(url string) ([]string, []string, error) {
 
 // WriteTest Writes tests cases to files, one for input, and another for output.
 func WriteTest(in, out, dir string, id int) error {
-	var inFile = fmt.Sprintf("%s/.in_%d.txt", dir, id)
+	var inFile = fmt.Sprintf("%s/.in%d.txt", dir, id)
 	if err := ioutil.WriteFile(inFile, []byte(in), 0644); err != nil {
 		return fmt.Errorf("Failed to write test input: %s", err)
 	}
-	var outFile = fmt.Sprintf("%s/.out_%d.txt", dir, id)
+	var outFile = fmt.Sprintf("%s/.out%d.txt", dir, id)
 	if err := ioutil.WriteFile(outFile, []byte(out), 0644); err != nil {
 		return fmt.Errorf("Failed to write test output: %s", err)
 	}

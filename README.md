@@ -12,10 +12,10 @@ With cf you can easily download test cases, generate boilerplate code for variou
     $ cf parse http://codeforces.com/contest/459/problem/C
     $ tree -a
     .
-    ├── .in_0.txt
-    ├── .in_1.txt
-    ├── .out_0.txt
-    ├── .out_1.txt
+    ├── .in1.txt
+    ├── .in2.txt
+    ├── .out1.txt
+    ├── .out2.txt
     └── .settings.yml
 
     0 directories, 5 files
@@ -33,23 +33,23 @@ With cf you can easily download test cases, generate boilerplate code for variou
     .
     └── CodeforcesRound261Div.2
         ├── A
-        │   ├── .in_0.txt
+        │   ├── .in1.txt
         │   ├── ...
         │   └── .settings.yml
         ├── B
-        │   ├── .in_0.txt
+        │   ├── .in1.txt
         │   ├── ...
         │   └── .settings.yml
         ├── C
-        │   ├── .in_0.txt
+        │   ├── .in1.txt
         │   ├── ...
         │   └── .settings.yml
         ├── D
-        │   ├── .in_0.txt
+        │   ├── .in1.txt
         │   ├── ...
         │   └── .settings.yml
         └── E
-            ├── .in_0.txt
+            ├── .in1.txt
             ├── ...
             └── .settings.yml
 

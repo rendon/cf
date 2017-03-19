@@ -54,7 +54,7 @@ func setup(c *cli.Context) {
 		if err = os.MkdirAll(dir, 0775); err != nil {
 			log.Fatalf("Failed to create directory: %s", err)
 		}
-		for i := 0; i < len(ins); i++ {
+		for i := 1; i <= len(ins); i++ {
 			if err = WriteTest(ins[i], outs[i], dir, i); err != nil {
 				log.Fatalf("Problem %c: %s", p, err)
 			}

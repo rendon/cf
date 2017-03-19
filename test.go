@@ -36,9 +36,9 @@ func test(c *cli.Context) {
 	if err = langs[lang].Setup(srcFile); err != nil {
 		log.Fatalf("Failed to setup source file: %s", err)
 	}
-	for i := 0; i < tests; i++ {
-		in := fmt.Sprintf(".in_%d.txt", i)
-		out := fmt.Sprintf(".out_%d.txt", i)
+	for i := 1; i <= tests; i++ {
+		in := fmt.Sprintf(".in%d.txt", i)
+		out := fmt.Sprintf(".out%d.txt", i)
 		fmt.Printf("Test #%d:", i)
 		if c.GlobalBool("verbose") {
 			fmt.Println()

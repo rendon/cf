@@ -40,7 +40,7 @@ func test(c *cli.Context) {
 	for i := 1; i <= tests; i++ {
 		in := fmt.Sprintf(".in%d.txt", i)
 		out := fmt.Sprintf(".out%d.txt", i)
-		fmt.Printf("Test #%d:", i)
+		fmt.Printf("Test #%d: ", i)
 		if c.GlobalBool("verbose") {
 			fmt.Println()
 		}

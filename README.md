@@ -7,7 +7,7 @@ With cf you can easily download test cases, generate boilerplate code for variou
 
 ## Usage examples
 
-###Download test cases for a single problem:
+### Download test cases for a single problem:
 
     $ cf parse http://codeforces.com/contest/459/problem/C
     $ tree -a
@@ -20,7 +20,7 @@ With cf you can easily download test cases, generate boilerplate code for variou
 
     0 directories, 5 files
 
-###Download test cases for all problems in a contest:
+### Download test cases for all problems in a contest:
 
     $ cf setup 459
     Problem A is ready!
@@ -55,14 +55,14 @@ With cf you can easily download test cases, generate boilerplate code for variou
 
     6 directories, 33 files
 
-###Introducing the cf global configuration file
+### Introducing the cf global configuration file
 cf uses the `~/.cf.yml` file to store global settings, e.g.:
 
     ---
     template.cpp: /home/user/templates/template.cpp
     template.go: /home/user/templates/template.go
 
-###Generate sample solution:
+### Generate sample solution:
 
     $ cf gen main.go
     $ cat main.go

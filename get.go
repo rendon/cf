@@ -18,8 +18,9 @@ func get(c *cli.Context) {
 	if err != nil {
 		log.Fatalf("Failed to parse problem: %s", err)
 	}
+	// TODO: Add test
 	for i := 1; i <= len(ins); i++ {
-		if err = WriteTest(ins[i], outs[i], ".", i); err != nil {
+		if err = WriteTest(ins[i-1], outs[i-1], ".", i); err != nil {
 			log.Fatalf("%s", err)
 		}
 	}

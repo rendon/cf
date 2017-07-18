@@ -55,7 +55,7 @@ func setup(c *cli.Context) {
 			log.Fatalf("Failed to create directory: %s", err)
 		}
 		for i := 1; i <= len(ins); i++ {
-			if err = WriteTest(ins[i], outs[i], dir, i); err != nil {
+			if err = WriteTest(ins[i-1], outs[i-1], dir, i); err != nil {
 				log.Fatalf("Problem %c: %s", p, err)
 			}
 		}

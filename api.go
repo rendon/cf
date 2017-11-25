@@ -50,7 +50,7 @@ const (
 
 // validators functions for every supported validator
 var validators = map[string]func(string, string) bool{
-	"lines": func(expected, actual string) bool {
+	validatorLines: func(expected, actual string) bool {
 		l1 := strings.Split(strings.TrimRight(expected, "\n"), "\n")
 		l2 := strings.Split(strings.TrimRight(actual, "\n"), "\n")
 		if len(l1) != len(l2) {
@@ -66,14 +66,14 @@ var validators = map[string]func(string, string) bool{
 		}
 		return true
 	},
-	"exact": func(expected, actual string) bool {
+	validatorExact: func(expected, actual string) bool {
 		if expected != actual {
 			log.Printf("Expected %q, got %q", expected, actual)
 			return false
 		}
 		return true
 	},
-	"numeric1e6": func(expected, actual string) bool {
+	validatorNumeric1e6: func(expected, actual string) bool {
 		r1 := strings.NewReader(expected)
 		r2 := strings.NewReader(actual)
 		for {
@@ -127,10 +127,6 @@ func cppSetup(srcFile string) error {
 
 // runBinary tests C++ solution with given input and output.
 func runBinary(srcFile, inFile, outFile, validator string) (bool, error) {
-	if validators[validator] == nil {
-		return false, fmt.Errorf("Unknown validator: %q", validator)
-	}
-
 	ext := filepath.Ext(srcFile)
 	if ext == "" {
 		return false, errors.New("File has no extension")
@@ -140,7 +136,23 @@ func runBinary(srcFile, inFile, outFile, validator string) (bool, error) {
 		return false, err
 	}
 	executable := wd + "/" + strings.TrimSuffix(srcFile, ext)
-	cmd := exec.Command(executable)
+	return runTest(exec.Command(executable), inFile, outFile, validator)
+}
+
+// runRuby tests  solution with given input and output.
+func runRuby(srcFile, inFile, outFile, validator string) (bool, error) {
+	wd, err := os.Getwd()
+	if err != nil {
+		return false, err
+	}
+	src := wd + "/" + srcFile
+	return runTest(exec.Command("ruby", src), inFile, outFile, validator)
+}
+
+func runTest(cmd *exec.Cmd, inFile, outFile, validator string) (bool, error) {
+	if validators[validator] == nil {
+		return false, fmt.Errorf("Unknown validator: %q", validator)
+	}
 
 	// Read input
 	buf, err := ioutil.ReadFile(inFile)
@@ -227,6 +239,12 @@ var langs = map[string]*Lang{
 		Sample: "#include <stdio.h>\nint main() {\n    return 0;\n}\n",
 		Setup:  cSetup,
 		Run:    runBinary,
+	},
+	"rb": &Lang{
+		Name:   "Ruby",
+		Sample: "#!/usr/bin/env ruby\nputs ''\n",
+		Setup:  func(srcFile string) error { return nil },
+		Run:    runRuby,
 	},
 }
 
@@ -403,8 +421,5 @@ func GenerateSampleSolution(srcFile string) error {
 		code = langs[ext].Sample
 	}
 
-	if err := ioutil.WriteFile(srcFile, []byte(code), 0664); err != nil {
-		return err
-	}
-	return nil
+	return ioutil.WriteFile(srcFile, []byte(code), 0664)
 }

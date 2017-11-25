@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
@@ -37,6 +38,8 @@ func test(c *cli.Context) {
 	if err = langs[lang].Setup(srcFile); err != nil {
 		log.Fatalf("Failed to setup source file: %s", err)
 	}
+
+	passedCount := 0
 	for i := 1; i <= tests; i++ {
 		in := fmt.Sprintf(".in%d.txt", i)
 		out := fmt.Sprintf(".out%d.txt", i)
@@ -53,8 +56,17 @@ func test(c *cli.Context) {
 		end := time.Now()
 		if passed {
 			fmt.Printf("PASSED %.3fs\n", end.Sub(start).Seconds())
+			passedCount++
 		} else {
 			fmt.Printf("FAILED %.3fs\n", end.Sub(start).Seconds())
 		}
+	}
+
+	fmt.Println()
+	if passedCount == tests {
+		fmt.Printf("PASSED %d/%d\n", passedCount, tests)
+	} else {
+		fmt.Fprintf(os.Stderr, "PASSED: %d FAILED: %d\n", passedCount, tests-passedCount)
+		os.Exit(1)
 	}
 }

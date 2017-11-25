@@ -2,6 +2,7 @@ default: bin/cf
 SRC=$(shell ls *.go)
 bin/cf: $(SRC)
 	go fmt
+	golint
 	go vet
 	go build -ldflags "-s" -o bin/cf
 
@@ -16,3 +17,6 @@ coverage-test:
 	go tool cover -func=coverage.out
 	go tool cover -html=coverage.out
 	rm coverage.out
+
+clean:
+	rm -vf bin/cf

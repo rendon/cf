@@ -23,7 +23,7 @@ func getCodeFromTemplate(ext string) (string, error) {
 	var key = "template." + ext
 	template, ok := settings[key].(string)
 	if !ok {
-		return "", fmt.Errorf("Failed to get %q from setting file.", key)
+		return "", fmt.Errorf("Failed to get %q from setting file", key)
 	}
 	buf, err := ioutil.ReadFile(template)
 	if err != nil {

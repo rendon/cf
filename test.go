@@ -7,6 +7,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
+	"github.com/fatih/color"
 )
 
 func test(c *cli.Context) {
@@ -39,7 +40,9 @@ func test(c *cli.Context) {
 		log.Fatalf("Failed to setup source file: %s", err)
 	}
 
-	passedCount := 0
+	green := color.New(color.FgGreen).SprintFunc()
+	red := color.New(color.FgRed).SprintFunc()
+	failureCount := 0
 	for i := 1; i <= tests; i++ {
 		in := fmt.Sprintf(".in%d.txt", i)
 		out := fmt.Sprintf(".out%d.txt", i)
@@ -55,18 +58,18 @@ func test(c *cli.Context) {
 		}
 		end := time.Now()
 		if passed {
-			fmt.Printf("PASSED %.3fs\n", end.Sub(start).Seconds())
-			passedCount++
+			fmt.Printf("%s %.3fs\n", green("PASSED"), end.Sub(start).Seconds())
 		} else {
-			fmt.Printf("FAILED %.3fs\n", end.Sub(start).Seconds())
+			fmt.Printf("%s %.3fs\n", red("FAILED"), end.Sub(start).Seconds())
+			failureCount++
 		}
 	}
 
 	fmt.Println()
-	if passedCount == tests {
-		fmt.Printf("PASSED %d/%d\n", passedCount, tests)
+	if failureCount == 0 {
+		fmt.Printf("%s\n", green("Well done!"))
 	} else {
-		fmt.Fprintf(os.Stderr, "PASSED: %d FAILED: %d\n", passedCount, tests-passedCount)
+		fmt.Fprintf(os.Stderr, "%s\n", red("Try again!"))
 		os.Exit(1)
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/rendon/asserting"
@@ -71,4 +72,20 @@ func (t *TestSuite) TestGenAndTest() {
 		}
 		t.AssertNil(os.Chdir(root))
 	}
+}
+
+func (t *TestSuite) TestSetup() {
+	root := os.Getenv("PWD")
+	dir := fmt.Sprintf("%s%carena", root, os.PathSeparator)
+	t.AssertNil(os.Chdir(dir))
+
+	cf := fmt.Sprintf("%s%cbin%ccf", root, os.PathSeparator, os.PathSeparator)
+	testcli.Run(cf, "setup", "399")
+	if !testcli.Success() {
+		fmt.Fprintf(os.Stderr, testcli.Stderr())
+		t.Fail("Failed to run `cf setup`")
+	}
+	text := "\nContest directory: CodeforcesRound233Div.2/\n"
+	t.AssertContainsStr(testcli.Stdout(), text)
+	t.AssertEqualInt(1, strings.Count(testcli.Stdout(), text))
 }

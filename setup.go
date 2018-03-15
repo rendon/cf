@@ -76,4 +76,5 @@ func setup(c *cli.Context) {
 		}
 		fmt.Printf("Problem %c is ready!\n", p)
 	}
+	fmt.Printf("\nContest directory: %s/\n", cname)
 }

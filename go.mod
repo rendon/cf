@@ -14,6 +14,8 @@ require (
 )
 
 require (
+	github.com/rendon/asserting v0.0.0-20181021213634-d8a44593ca11 // indirect
+	github.com/rendon/testcli v1.0.0 // indirect
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1 // indirect
 )

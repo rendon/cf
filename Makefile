@@ -2,7 +2,6 @@ default: bin/cf
 SRC=$(shell ls *.go)
 bin/cf: $(SRC)
 	go fmt
-	golint
 	go vet
 	go build -ldflags "-s" -o bin/cf
 

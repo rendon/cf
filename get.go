@@ -2,7 +2,6 @@
 package main
 
 import (
-	"errors"
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
 )
@@ -43,16 +42,4 @@ func get(c *cli.Context) {
 	if err = WriteKeyValueYamlFile(".settings.yml", settings); err != nil {
 		log.Fatalf("Unable to write settings file: %s", err)
 	}
-}
-
-func getUrlFromSettings() (string, error) {
-	settings, err := ReadKeyValueYamlFile(".settings.yml")
-	if err != nil {
-		return "", err
-	}
-	url, ok := settings["problemUrl"].(string)
-	if !ok || len(url) == 0 {
-		return "", errors.New("url not found in settings")
-	}
-	return url, nil
 }

@@ -224,25 +224,25 @@ func goSetup(sourceFile string) error {
 var langs = map[string]*Lang{
 	"go": &Lang{
 		Name:   "Golang",
-		Sample: "package main\n\nimport ()\n\nfunc main() {\n}\n",
+		Sample: "// {{PROGRAM_PURPOSE}}\npackage main\n\nimport ()\n\nfunc main() {\n}\n",
 		Setup:  goSetup,
 		Run:    runBinary,
 	},
 	"cpp": &Lang{
 		Name:   "C++",
-		Sample: "#include <bits/stdc++.h>\nint main() {\n    return 0;\n}\n",
+		Sample: "// {{PROGRAM_PURPOSE}}\n#include <bits/stdc++.h>\nint main() {\n    return 0;\n}\n",
 		Setup:  cppSetup,
 		Run:    runBinary,
 	},
 	"c": &Lang{
 		Name:   "C",
-		Sample: "#include <stdio.h>\nint main() {\n    return 0;\n}\n",
+		Sample: "// {{PROGRAM_PURPOSE}}\n#include <stdio.h>\nint main() {\n    return 0;\n}\n",
 		Setup:  cSetup,
 		Run:    runBinary,
 	},
 	"rb": &Lang{
 		Name:   "Ruby",
-		Sample: "#!/usr/bin/env ruby\nputs ''\n",
+		Sample: "#!/usr/bin/env ruby\n# {{PROGRAM_PURPOSE}}\nputs 'hello!'\n",
 		Setup:  func(sourceFile string) error { return nil },
 		Run:    runRuby,
 	},
@@ -421,5 +421,23 @@ func GenerateSampleSolution(sourceFile string) error {
 		code = langs[ext].Sample
 	}
 
+	url, err := getUrlFromSettings()
+	if err == nil {
+		code = strings.ReplaceAll(
+			code, "{{PROGRAM_PURPOSE}}",
+			fmt.Sprintf("This program solves %s", url),
+		)
+	}
 	return ioutil.WriteFile(sourceFile, []byte(code), 0664)
+}
+func getUrlFromSettings() (string, error) {
+	settings, err := ReadKeyValueYamlFile(".settings.yml")
+	if err != nil {
+		return "", err
+	}
+	url, ok := settings["problemUrl"].(string)
+	if !ok || len(url) == 0 {
+		return "", errors.New("url not found in settings")
+	}
+	return url, nil
 }

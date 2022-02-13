@@ -59,5 +59,4 @@ func gen(c *cli.Context) {
 	if err = WriteKeyValueYamlFile(settingsFile, settings); err != nil {
 		log.Printf("Failed to write settings file: %s\n", err)
 	}
-
 }

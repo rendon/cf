@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	log.SetLevel(log.WarnLevel)
+	log.SetLevel(log.InfoLevel)
 }
 
 func main() {

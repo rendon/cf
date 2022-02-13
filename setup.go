@@ -62,12 +62,12 @@ func setup(c *cli.Context) {
 
 		var settings = map[string]interface{}{"tests": len(ins)}
 		if lang != "" {
-			var srcFile = fmt.Sprintf("%s/%c.%s", dir, p, lang)
-			if err = GenerateSampleSolution(srcFile); err != nil {
+			var sourceFile = fmt.Sprintf("%s/%c.%s", dir, p, lang)
+			if err = GenerateSampleSolution(sourceFile); err != nil {
 				log.Printf("Failed to generate sample solution: %s", err)
 			}
 			settings["lang"] = lang
-			settings["sourceFile"] = filepath.Base(srcFile)
+			settings["sourceFile"] = filepath.Base(sourceFile)
 		}
 
 		err = WriteKeyValueYamlFile(dir+"/.settings.yml", settings)

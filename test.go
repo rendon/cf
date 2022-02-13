@@ -19,7 +19,7 @@ func test(c *cli.Context) {
 	if !ok {
 		log.Fatalf("No 'lang' field found in settings file.")
 	}
-	srcFile, ok := settings["sourceFile"].(string)
+	sourceFile, ok := settings["sourceFile"].(string)
 	if !ok {
 		log.Fatalf("No 'sourceFile' field found in settings file.")
 	}
@@ -36,7 +36,7 @@ func test(c *cli.Context) {
 		log.Fatalf("Language %q not supported.", lang)
 	}
 
-	if err = langs[lang].Setup(srcFile); err != nil {
+	if err = langs[lang].Setup(sourceFile); err != nil {
 		log.Fatalf("Failed to setup source file: %s", err)
 	}
 
@@ -52,7 +52,7 @@ func test(c *cli.Context) {
 		}
 
 		start := time.Now()
-		passed, err := langs[lang].Run(srcFile, in, out, validator)
+		passed, err := langs[lang].Run(sourceFile, in, out, validator)
 		if err != nil {
 			log.Fatalf("Test %d failed: %s", i, err)
 		}

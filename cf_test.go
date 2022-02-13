@@ -43,15 +43,15 @@ func (t *TestSuite) TestGenAndTest() {
 	cf := fmt.Sprintf("%s%cbin%ccf", root, os.PathSeparator, os.PathSeparator)
 	for lang, ext := range supportedLangs {
 		dir := fmt.Sprintf("arena/%s", lang)
-		srcFile := fmt.Sprintf("%s/%s.%s", dir, lang, ext)
-		fmt.Printf("srcFile: %s\n", srcFile)
-		testcli.Run(cf, "gen", srcFile)
+		sourceFile := fmt.Sprintf("%s/%s.%s", dir, lang, ext)
+		fmt.Printf("sourceFile: %s\n", sourceFile)
+		testcli.Run(cf, "gen", sourceFile)
 		if !testcli.Success() {
 			fmt.Printf(testcli.Stderr())
 			t.Fail("Failed to run `cf gen` for lang " + lang)
 		}
 
-		body, err := ioutil.ReadFile(srcFile)
+		body, err := ioutil.ReadFile(sourceFile)
 		t.AssertNil(err)
 		t.Assert(len(body) > 0)
 

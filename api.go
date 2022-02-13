@@ -101,14 +101,14 @@ var validators = map[string]func(string, string) bool{
 }
 
 // cppSetup compiles C++ solution
-func cppSetup(srcFile string) error {
-	ext := filepath.Ext(srcFile)
+func cppSetup(sourceFile string) error {
+	ext := filepath.Ext(sourceFile)
 	if ext == "" {
 		return errors.New("File has no extension")
 	}
-	out := strings.TrimSuffix(srcFile, ext)
+	out := strings.TrimSuffix(sourceFile, ext)
 	ext = ext[1:]
-	cmd := exec.Command("g++", "-std=c++14", "-W", "-o", out, srcFile)
+	cmd := exec.Command("g++", "-std=c++14", "-W", "-o", out, sourceFile)
 
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
@@ -126,8 +126,8 @@ func cppSetup(srcFile string) error {
 }
 
 // runBinary tests C++ solution with given input and output.
-func runBinary(srcFile, inFile, outFile, validator string) (bool, error) {
-	ext := filepath.Ext(srcFile)
+func runBinary(sourceFile, inFile, outFile, validator string) (bool, error) {
+	ext := filepath.Ext(sourceFile)
 	if ext == "" {
 		return false, errors.New("File has no extension")
 	}
@@ -135,17 +135,17 @@ func runBinary(srcFile, inFile, outFile, validator string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	executable := wd + "/" + strings.TrimSuffix(srcFile, ext)
+	executable := wd + "/" + strings.TrimSuffix(sourceFile, ext)
 	return runTest(exec.Command(executable), inFile, outFile, validator)
 }
 
 // runRuby tests  solution with given input and output.
-func runRuby(srcFile, inFile, outFile, validator string) (bool, error) {
+func runRuby(sourceFile, inFile, outFile, validator string) (bool, error) {
 	wd, err := os.Getwd()
 	if err != nil {
 		return false, err
 	}
-	src := wd + "/" + srcFile
+	src := wd + "/" + sourceFile
 	return runTest(exec.Command("ruby", src), inFile, outFile, validator)
 }
 
@@ -179,14 +179,14 @@ func runTest(cmd *exec.Cmd, inFile, outFile, validator string) (bool, error) {
 }
 
 // cSetup compiles C solution
-func cSetup(srcFile string) error {
-	ext := filepath.Ext(srcFile)
+func cSetup(sourceFile string) error {
+	ext := filepath.Ext(sourceFile)
 	if ext == "" {
 		return errors.New("File has no extension")
 	}
-	out := strings.TrimSuffix(srcFile, ext)
+	out := strings.TrimSuffix(sourceFile, ext)
 	ext = ext[1:]
-	cmd := exec.Command("gcc", "-W", "-o", out, srcFile)
+	cmd := exec.Command("gcc", "-W", "-o", out, sourceFile)
 
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
@@ -204,8 +204,8 @@ func cSetup(srcFile string) error {
 }
 
 // goSetup compiles Go solution
-func goSetup(srcFile string) error {
-	cmd := exec.Command("go", "build", srcFile)
+func goSetup(sourceFile string) error {
+	cmd := exec.Command("go", "build", sourceFile)
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 	if err := cmd.Start(); err != nil {
@@ -243,7 +243,7 @@ var langs = map[string]*Lang{
 	"rb": &Lang{
 		Name:   "Ruby",
 		Sample: "#!/usr/bin/env ruby\nputs ''\n",
-		Setup:  func(srcFile string) error { return nil },
+		Setup:  func(sourceFile string) error { return nil },
 		Run:    runRuby,
 	},
 }
@@ -395,9 +395,9 @@ func GetContestName(id int) (string, error) {
 
 // GenerateSampleSolution generates sample solution from file name, programming
 // language will be determined from file extension.
-func GenerateSampleSolution(srcFile string) error {
+func GenerateSampleSolution(sourceFile string) error {
 	// Get file extension
-	var ext = filepath.Ext(srcFile)
+	var ext = filepath.Ext(sourceFile)
 	if strings.HasPrefix(ext, ".") {
 		ext = ext[1:]
 	}
@@ -406,7 +406,7 @@ func GenerateSampleSolution(srcFile string) error {
 	}
 
 	// Get directory (if any)
-	var dir = filepath.Dir(srcFile)
+	var dir = filepath.Dir(sourceFile)
 	if dir != "" {
 		if err := os.MkdirAll(dir, 0755); err != nil {
 			return err
@@ -421,5 +421,5 @@ func GenerateSampleSolution(srcFile string) error {
 		code = langs[ext].Sample
 	}
 
-	return ioutil.WriteFile(srcFile, []byte(code), 0664)
+	return ioutil.WriteFile(sourceFile, []byte(code), 0664)
 }

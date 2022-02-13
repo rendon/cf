@@ -67,7 +67,7 @@ func setup(c *cli.Context) {
 				log.Printf("Failed to generate sample solution: %s", err)
 			}
 			settings["lang"] = lang
-			settings["src_file"] = filepath.Base(srcFile)
+			settings["sourceFile"] = filepath.Base(srcFile)
 		}
 
 		err = WriteKeyValueYamlFile(dir+"/.settings.yml", settings)

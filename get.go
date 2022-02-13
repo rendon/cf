@@ -2,19 +2,24 @@
 package main
 
 import (
-	"os"
-
+	"errors"
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
 )
 
 func get(c *cli.Context) {
-	if len(c.Args()) != 1 {
-		log.Fatalf("USAGE: get <URL>")
-		return
+	var problemURL string
+	if len(c.Args()) == 1 {
+		problemURL = c.Args()[0]
+	} else {
+		url, err := getUrlFromSettings()
+		if err != nil {
+			log.Fatalf("Unable to get URL from the settings. Please provide a URL")
+		}
+		problemURL = url
 	}
-	var url = c.Args()[0]
-	var ins, outs, err = ParseProblem(url)
+
+	var ins, outs, err = ParseProblem(problemURL)
 	if err != nil {
 		log.Fatalf("Failed to parse problem: %s", err)
 	}
@@ -25,15 +30,29 @@ func get(c *cli.Context) {
 		}
 	}
 
-	var settings = make(map[string]interface{})
-	if _, err = os.Stat(".settings.yml"); err == nil {
-		if settings, err = ReadKeyValueYamlFile(".settings.yml"); err != nil {
-			log.Fatalf("Failed to read settings file: %s", err)
-		}
-	} else {
-		settings["tests"] = len(ins)
+	settings, err := ReadKeyValueYamlFile(".settings.yml")
+	if err != nil {
+		log.Printf("Unable to read settings file: %s", err)
+		settings = make(map[string]interface{})
 	}
+
+	// The problem description determines these values. Override the settings if needed.
+	settings["problemUrl"] = problemURL
+	settings["tests"] = len(ins)
+
 	if err = WriteKeyValueYamlFile(".settings.yml", settings); err != nil {
-		log.Fatalf("Failed to write settings file: %s", err)
+		log.Fatalf("Unable to write settings file: %s", err)
 	}
+}
+
+func getUrlFromSettings() (string, error) {
+	settings, err := ReadKeyValueYamlFile(".settings.yml")
+	if err != nil {
+		return "", err
+	}
+	url, ok := settings["problemUrl"].(string)
+	if !ok || len(url) == 0 {
+		return "", errors.New("url not found in settings")
+	}
+	return url, nil
 }

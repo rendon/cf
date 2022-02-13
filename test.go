@@ -19,9 +19,9 @@ func test(c *cli.Context) {
 	if !ok {
 		log.Fatalf("No 'lang' field found in settings file.")
 	}
-	srcFile, ok := settings["src_file"].(string)
+	srcFile, ok := settings["sourceFile"].(string)
 	if !ok {
-		log.Fatalf("No 'src_file' field found in settings file.")
+		log.Fatalf("No 'sourceFile' field found in settings file.")
 	}
 	tests, ok := settings["tests"].(int)
 	if !ok {

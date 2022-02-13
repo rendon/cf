@@ -51,7 +51,7 @@ func gen(c *cli.Context) {
 		settings = make(map[string]interface{})
 	}
 	settings["lang"] = ext
-	settings["src_file"] = filepath.Base(srcFile)
+	settings["sourceFile"] = filepath.Base(srcFile)
 	settingsFile := ".settings.yml"
 	if dir := filepath.Dir(srcFile); dir != "" {
 		settingsFile = dir + "/" + settingsFile

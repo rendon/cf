@@ -4,3 +4,4 @@ bin/cf
 arena/
 cf
 .settings.yml
+.idea/

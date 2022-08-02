@@ -39,7 +39,7 @@ func gen(c *cli.Context) {
 		return
 	}
 	var sourceFile = c.Args()[0]
-	if err := GenerateSampleSolution(sourceFile); err != nil {
+	if err := GenerateSampleSolution(sourceFile, ""); err != nil {
 		log.Fatalf("Failed to generate sample solution: %s", err)
 	}
 

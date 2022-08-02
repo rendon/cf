@@ -1,10 +1,10 @@
-default: bin/cf
 SRC=$(shell ls *.go)
 bin/cf: $(SRC)
 	go fmt
 	go vet
 	go build -ldflags "-s" -o bin/cf
 
+default: bin/cf
 install: bin/cf
 	mkdir -p ~/bin
 	cp bin/cf ~/bin/

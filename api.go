@@ -395,7 +395,7 @@ func GetContestName(id int) (string, error) {
 
 // GenerateSampleSolution generates sample solution from file name, programming
 // language will be determined from file extension.
-func GenerateSampleSolution(sourceFile string) error {
+func GenerateSampleSolution(sourceFile, problemUrl string) error {
 	// Get file extension
 	var ext = filepath.Ext(sourceFile)
 	if strings.HasPrefix(ext, ".") {
@@ -421,17 +421,25 @@ func GenerateSampleSolution(sourceFile string) error {
 		code = langs[ext].Sample
 	}
 
-	url, err := getUrlFromSettings()
-	if err == nil {
-		code = strings.ReplaceAll(
-			code, "{{PROGRAM_PURPOSE}}",
-			fmt.Sprintf("This program solves %s", url),
-		)
+	if problemUrl == "" {
+		log.Infof("Problem URL not specified. Will try to get from the settings file.")
+		url, err := getUrlFromSettings(dir)
+		if err != nil {
+			log.Infof("Unable to load settings: %s", err)
+			return err
+		}
+		problemUrl = url
+		log.Printf("Problem URL: %s", problemUrl)
 	}
+	code = strings.ReplaceAll(
+		code, "{{PROGRAM_PURPOSE}}",
+		fmt.Sprintf("This program solves %s", problemUrl),
+	)
 	return ioutil.WriteFile(sourceFile, []byte(code), 0664)
 }
-func getUrlFromSettings() (string, error) {
-	settings, err := ReadKeyValueYamlFile(".settings.yml")
+
+func getUrlFromSettings(dir string) (string, error) {
+	settings, err := ReadKeyValueYamlFile(fmt.Sprintf("%s/.settings.yml", dir))
 	if err != nil {
 		return "", err
 	}

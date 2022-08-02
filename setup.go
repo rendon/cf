@@ -12,7 +12,7 @@ import (
 )
 
 func setup(c *cli.Context) {
-	if len(c.Args()) != 1 {
+	if len(c.Args()) < 1 {
 		cli.ShowCommandHelp(c, "setup")
 		return
 	}
@@ -45,8 +45,8 @@ func setup(c *cli.Context) {
 		log.Fatalf("Failed to create contest directory: %s", err)
 	}
 	for p := 'A'; p <= 'Z'; p++ {
-		var url = fmt.Sprintf("%s/contest/%d/problem/%c", baseURL, cid, p)
-		var ins, outs, err = ParseProblem(url)
+		var problemUrl = fmt.Sprintf("%s/contest/%d/problem/%c", baseURL, cid, p)
+		var ins, outs, err = ParseProblem(problemUrl)
 		if err != nil {
 			break
 		}
@@ -60,10 +60,13 @@ func setup(c *cli.Context) {
 			}
 		}
 
-		var settings = map[string]interface{}{"tests": len(ins)}
+		var settings = map[string]interface{}{
+			"tests":      len(ins),
+			"problemUrl": problemUrl,
+		}
 		if lang != "" {
-			var sourceFile = fmt.Sprintf("%s/%c.%s", dir, p, lang)
-			if err = GenerateSampleSolution(sourceFile); err != nil {
+			var sourceFile = fmt.Sprintf("%s/main.%s", dir, lang)
+			if err = GenerateSampleSolution(sourceFile, problemUrl); err != nil {
 				log.Printf("Failed to generate sample solution: %s", err)
 			}
 			settings["lang"] = lang

@@ -11,7 +11,7 @@ func get(c *cli.Context) {
 	if len(c.Args()) == 1 {
 		problemURL = c.Args()[0]
 	} else {
-		url, err := getUrlFromSettings()
+		url, err := getUrlFromSettings(".")
 		if err != nil {
 			log.Fatalf("Unable to get URL from the settings. Please provide a URL")
 		}

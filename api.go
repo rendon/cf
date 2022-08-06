@@ -425,16 +425,19 @@ func GenerateSampleSolution(sourceFile, problemUrl string) error {
 		log.Infof("Problem URL not specified. Will try to get from the settings file.")
 		url, err := getUrlFromSettings(dir)
 		if err != nil {
-			log.Infof("Unable to load settings: %s", err)
-			return err
+			log.Infof("Unable to get problem URL from settings: %s", err)
+		} else {
+			problemUrl = url
+			log.Printf("Problem URL: %s", problemUrl)
 		}
-		problemUrl = url
-		log.Printf("Problem URL: %s", problemUrl)
 	}
-	code = strings.ReplaceAll(
-		code, "{{PROGRAM_PURPOSE}}",
-		fmt.Sprintf("This program solves %s", problemUrl),
-	)
+
+	if len(problemUrl) > 0 {
+		code = strings.ReplaceAll(
+			code, "{{PROGRAM_PURPOSE}}",
+			fmt.Sprintf("This program solves %s", problemUrl),
+		)
+	}
 	return ioutil.WriteFile(sourceFile, []byte(code), 0664)
 }
 
